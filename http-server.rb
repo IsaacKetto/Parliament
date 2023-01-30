@@ -1,5 +1,6 @@
 require 'socket'
 require_relative 'lib/request_handler'
+require 'mime/types'
 
 class HTTPServer
 
@@ -22,23 +23,35 @@ class HTTPServer
             puts data
             puts "-" * 40 
 
+            @resource_handler = ResourceHandler.new(session, data) #fixa Klass för resources
+            
             resource = @request_handler.parse_request(data)["resource"]
+            
+            resource_type = MIME::Types.type_for('html' + resource).first
+            resource_media_type = resource_type.media_type
+            resource_sub_type = resource_type.sub_type
 
-            #Er HTTP-PARSER tar emot "data"
-            if File.exist?('html' + resource + ".html")
+            if File.exist?('html' + resource)
                 status = 200
-                html = File.read('html' + resource + ".html")
+                case resource_media_type
+                when "text"
+                    resource_file = File.read('html' + resource)
+                    file_size = resource_file.size
+                when "image"
+                    resource_file = File.binread('html' + resource)
+                    file_size = resource_file.bytesize
+                end
             else
                 status = 404
-                html = "ERROR 404 NOT FOUND"
+                resource_file = "ERROR 404 NOT FOUND"
             end
 
-            #Sen kolla om resursen (filen finns)
 
             session.print "HTTP/1.1 #{status}\r\n"
-            session.print "Content-Type: text/html\r\n"
+            session.print "Content-Type: #{resource_media_type}/#{resource_sub_type}\r\n"
+            session.print "Content-length: #{file_size}\r\n"
             session.print "\r\n"
-            session.print html
+            session.print resource_file
             session.close
         end
     end
