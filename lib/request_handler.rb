@@ -1,14 +1,15 @@
-class RequestHandler
+class Request
 
-  def parse_request(request)
+  attr_accessor :verb, :resource, :version, :headers
+
+  def initialize(request)
     lines = request.split("\n")
     request_line = lines.first
-    headers = lines
+    @headers = lines
       .drop(1)
       .map {|header| header.split(": ")}
       .to_h
-    verb, resource, version = request_line.split(" ")
-    {"verb" => verb, "resource" => resource, "version" => version, "headers" => headers}
+    @verb, @resource, @version = request_line.split(" ")
   end
 
 end
