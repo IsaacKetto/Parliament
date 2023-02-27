@@ -5,9 +5,10 @@ class Response
         run
     end
 
+    private
     def run
 
-        request = Request.new(@data)
+        request = Request.new(@data) 
 
         resource_type = MIME::Types.type_for('html' + request.resource).first
         resource_media_type = resource_type.media_type
