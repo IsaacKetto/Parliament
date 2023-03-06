@@ -1,11 +1,17 @@
 require 'socket'
-require 'mime/types'
 Dir[File.dirname(__FILE__) + '/lib/*.rb'].each {|file| require file }
 
 class HTTPServer
 
     def initialize(port)
         @port = port
+        @routes = []
+    end
+
+    def add_get_route(route)
+        if block_given?
+            
+        @routes.append(route)
     end
 
     def start
