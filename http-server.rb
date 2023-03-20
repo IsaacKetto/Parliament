@@ -5,13 +5,18 @@ class HTTPServer
 
     def initialize(port)
         @port = port
-        @routes = []
+        @routes = {}
     end
 
+    #add_get_route('/grill/:number/:name')
+
     def add_get_route(route)
-        if block_given?
             
-        @routes.append(route)
+        @routes.set(route, )
+    end
+
+    def open_file
+        
     end
 
     def start
