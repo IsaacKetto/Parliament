@@ -10,7 +10,7 @@ class HTTPServer
 
     def start
 
-        @routes.add_get_route('/test') do
+        @routes.add_get_route('/test/:text') do |text|
             html = <<-HTML
                 <!DOCTYPE html>
                 <html lang="en">
@@ -22,7 +22,8 @@ class HTTPServer
                     <title>Document</title>
                 </head>
                 <body>
-                    <h1>Test!</h1>
+                    <h1>#{text}!</h1>
+                    <h2>#{1+2}</h2>
                     <img src="/img/grill.jpg" alt="GRill bild">
                     <script src="/js/main.js"></script>
                 </body>

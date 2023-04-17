@@ -5,11 +5,17 @@ class Routes
         @routes = Hash.new{|hsh, key| hsh[key] = [] }
     end
 
-    def add_get_route(route, &block)
-        @routes["get"].push({route: route, block: block})
+    def add_get_route(route, &block) 
+        regex_route = route.gsub(/:\w+/, '(.+)')
+        regex_route = "\/#{regex_route.split('/').join('\/')}\/"
+        #Make it able to use the param data in the block data
+        @routes["get"].push({route: regex_route, block: block})
     end
 
     def match_route(verb, resource)
+
+        # resource.match(regex).captures
+
         @routes[verb].each do |route|
             if route[:route] == resource
                 return true
