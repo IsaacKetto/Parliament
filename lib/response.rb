@@ -1,6 +1,13 @@
 require 'mime/types'
+require 'yard'
 
 class Response
+    # Constructs the Response object
+    #
+    # @param routes [Array] List with strings
+    # @param session [TCPSocket] Server session
+    # @param request [String] String with session data
+    # @return [void]
     def initialize(routes, session, request)
         @routes = routes
         @session = session
@@ -13,7 +20,7 @@ class Response
         #dynamic
         if @status == 404
             @request = Request.new(request)
-            if @routes.match_route(@request.verb.downcase, @request.resource.downcase)
+            if @routes.check_route(@request.verb.downcase, @request.resource.downcase)
                 @status = 200
                 @content = @routes.block_value(@request.verb.downcase, @request.resource.downcase)
                 
@@ -24,6 +31,9 @@ class Response
     end
 
     private
+    #Checks if resource is html by checking for a "."
+    #
+    # @return [String, String] Returns 2 seperate strings that determines the path for static file and what resource type it is
     def resource
         if !@request.resource.include?(".")
             @request.resource += ".html"
@@ -33,6 +43,9 @@ class Response
         resource_type = MIME::Types.type_for(file_route).first
         return file_route, resource_type
     end
+    #Checks if there is a file for @file_route
+    #
+    # @return [String, Integer, Integer] Returns content - file data, status - Status code for server, file_size - A number that tells the size of the file
     def file_check
         if File.exist?(@file_route)
             status = 200
@@ -48,8 +61,13 @@ class Response
             status = 404
             content = "NOT FOUND"
         end
+        p status.class
+        p file_size.class
         return content, status, file_size
     end
+    # Prints data for the server session
+    #
+    # @return [void]
     def session_print
         @session.print "HTTP/1.1 #{@status}\r\n"
         @session.print "Content-Type: #{@resource_type.media_type}/#{@resource_type.sub_type}\r\n"
